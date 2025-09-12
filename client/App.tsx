@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import Enrollment from "./pages/Enrollment";
 import Alerts from "./pages/Alerts";
 import SystemStatus from "./pages/SystemStatus";
+import AnnualAttendance from "./pages/AnnualAttendance";
+import ManualAttendance from "./pages/ManualAttendance";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "@/context/auth";
@@ -35,6 +37,8 @@ const App = () => (
             <Route path="/enrollment" element={<Protected><Enrollment /></Protected>} />
             <Route path="/alerts" element={<Protected><Alerts /></Protected>} />
             <Route path="/status" element={<Protected><SystemStatus /></Protected>} />
+            <Route path="/annual" element={<Protected><AnnualAttendance /></Protected>} />
+            <Route path="/manual" element={<Protected><ManualAttendance /></Protected>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
