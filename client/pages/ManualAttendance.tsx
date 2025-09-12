@@ -6,8 +6,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useAuth } from "@/context/auth";
 
 export default function ManualAttendance() {
+  const { profile } = useAuth();
+  const doId = profile?.doId || localStorage.getItem("do.id") || "DO";
+  const schoolId = profile?.schoolId || "SCHOOL";
   const [cls, setCls] = useState("Class 7");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0,10));
   const [students, setStudents] = useState<{ name: string; id: string }[]>([]);
@@ -21,7 +25,7 @@ export default function ManualAttendance() {
   }, [cls]);
 
   const save = () => {
-    const key = `attendance:${date}:${cls}`;
+    const key = `attendance:${doId}:${schoolId}:${date}:${cls}`;
     localStorage.setItem(key, JSON.stringify(present));
     toast.success("Manual attendance saved");
   };
