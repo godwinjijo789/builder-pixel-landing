@@ -26,13 +26,14 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Bell, Gauge, Layers, Settings, UserPlus, CalendarDays, CheckSquare } from "lucide-react";
+import { Bell, Gauge, Layers, Settings, UserPlus, CalendarDays, CheckSquare, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth";
 
-function NavLink({ to, label, icon: Icon }: { to: string; label: string; icon: React.ComponentType<{ className?: string }>; }) {
+function NavLink({ to, label, icon: Icon, hidden }: { to: string; label: string; icon: React.ComponentType<{ className?: string }>; hidden?: boolean; }) {
   const location = useLocation();
   const active = location.pathname === to;
+  if (hidden) return null;
   return (
     <SidebarMenuItem>
       <Link to={to} className="contents">
@@ -46,7 +47,7 @@ function NavLink({ to, label, icon: Icon }: { to: string; label: string; icon: R
 }
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-  const { logout } = useAuth();
+  const { logout, role, profile, saveProfile } = useAuth();
   const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -72,11 +73,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <SidebarGroupContent>
               <SidebarMenu>
                 <NavLink to="/" label="Dashboard" icon={Gauge} />
-                <NavLink to="/enrollment" label="Student Enrollment" icon={UserPlus} />
+                <NavLink to="/enrollment" label="Student Enrollment" icon={UserPlus} hidden={role === 'do'} />
                 <NavLink to="/alerts" label="Parent Alerts" icon={Bell} />
                 <NavLink to="/status" label="System Status" icon={Layers} />
                 <NavLink to="/annual" label="Annual Attendance" icon={CalendarDays} />
-                <NavLink to="/manual" label="Manual Attendance" icon={CheckSquare} />
+                <NavLink to="/manual" label="Manual Attendance" icon={CheckSquare} hidden={role === 'do'} />
+                <NavLink to="/do-office" label="DO Office" icon={Building2} hidden={role !== 'do'} />
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -111,6 +113,20 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                       </div>
                       <Switch checked={dark} onCheckedChange={setDark} />
                     </div>
+
+                    {role === 'school' && (
+                      <div className="space-y-2">
+                        <div className="font-medium">School Details</div>
+                        <div className="grid sm:grid-cols-2 gap-2">
+                          <label className="text-sm">School Name<input className="input-like" value={profile?.name || ''} onChange={(e)=>saveProfile({ ...(profile||{name:'',schoolId:'',district:'',address:'',doId:''}), name:e.target.value })} /></label>
+                          <label className="text-sm">School ID<input className="input-like" value={profile?.schoolId || ''} onChange={(e)=>saveProfile({ ...(profile||{name:'',schoolId:'',district:'',address:'',doId:''}), schoolId:e.target.value })} /></label>
+                          <label className="text-sm">District<input className="input-like" value={profile?.district || ''} onChange={(e)=>saveProfile({ ...(profile||{name:'',schoolId:'',district:'',address:'',doId:''}), district:e.target.value })} /></label>
+                          <label className="text-sm">Address<input className="input-like" value={profile?.address || ''} onChange={(e)=>saveProfile({ ...(profile||{name:'',schoolId:'',district:'',address:'',doId:''}), address:e.target.value })} /></label>
+                          <label className="text-sm sm:col-span-2">DO Office ID<input className="input-like" value={profile?.doId || ''} onChange={(e)=>saveProfile({ ...(profile||{name:'',schoolId:'',district:'',address:'',doId:''}), doId:e.target.value })} /></label>
+                        </div>
+                      </div>
+                    )}
+
                     <Button variant="destructive" onClick={logout}>Logout</Button>
                   </div>
                 </DialogContent>
@@ -121,6 +137,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         </header>
+        <style>{`.input-like{ @apply w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring; }`}</style>
         <main className="p-4 md:p-6 bg-muted/30 min-h-[calc(100svh-3rem)]">{children}</main>
         <footer className="border-t text-xs text-muted-foreground bg-background">
           <div className="container mx-auto px-4 py-3 flex items-center gap-6">
