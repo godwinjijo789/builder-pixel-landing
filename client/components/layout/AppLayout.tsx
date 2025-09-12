@@ -1,7 +1,15 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import {
   Sidebar,
   SidebarContent,
@@ -18,8 +26,9 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Bell, Gauge, Layers, Settings, UserPlus } from "lucide-react";
+import { Bell, Gauge, Layers, Settings, UserPlus, CalendarDays, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/auth";
 
 function NavLink({ to, label, icon: Icon }: { to: string; label: string; icon: React.ComponentType<{ className?: string }>; }) {
   const location = useLocation();
@@ -37,6 +46,17 @@ function NavLink({ to, label, icon: Icon }: { to: string; label: string; icon: R
 }
 
 export default function AppLayout({ children }: { children: ReactNode }) {
+  const { logout } = useAuth();
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("theme.dark", dark ? "1" : "0");
+  }, [dark]);
+  useEffect(() => {
+    const saved = localStorage.getItem("theme.dark");
+    if (saved) document.documentElement.classList.toggle("dark", saved === "1");
+  }, []);
+
   return (
     <SidebarProvider>
       <Sidebar className="border-r">
@@ -55,6 +75,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 <NavLink to="/enrollment" label="Student Enrollment" icon={UserPlus} />
                 <NavLink to="/alerts" label="Parent Alerts" icon={Bell} />
                 <NavLink to="/status" label="System Status" icon={Layers} />
+                <NavLink to="/annual" label="Annual Attendance" icon={CalendarDays} />
+                <NavLink to="/manual" label="Manual Attendance" icon={CheckSquare} />
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -67,15 +89,34 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-20 border-b bg-primary text-primary-foreground">
-          <div className="flex h-12 items-center px-3">
+          <div className="flex h-12 items-center px-3 w-full">
             <SidebarTrigger className={cn("text-primary-foreground hover:bg-white/10")}/>
             <div className="ml-2 font-semibold tracking-tight">Automated Attendance for Rural Schools</div>
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-white/10">
-                <Settings className="h-4 w-4" />
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-white/10">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Settings</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">Dark Mode</div>
+                        <div className="text-sm text-muted-foreground">Toggle site theme</div>
+                      </div>
+                      <Switch checked={dark} onCheckedChange={setDark} />
+                    </div>
+                    <Button variant="destructive" onClick={logout}>Logout</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Avatar className="h-7 w-7 border border-white/30">
-                <AvatarFallback className="bg-white/20 text-white">GJ</AvatarFallback>
+                <AvatarFallback className="bg-white/20 text-white">AD</AvatarFallback>
               </Avatar>
             </div>
           </div>
