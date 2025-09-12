@@ -6,16 +6,33 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 export default function Enrollment() {
+  const [student, setStudent] = useState<any>({ gender: "Male", className: "Class 7" });
+  const [faceImage, setFaceImage] = useState<string | null>(null);
+
+  const save = () => {
+    if (!student.name || !student.roll) {
+      toast.error("Please complete required fields: name and roll number.");
+      return;
+    }
+    const list = JSON.parse(localStorage.getItem("students") || "[]");
+    list.push({ ...student, faceImage });
+    localStorage.setItem("students", JSON.stringify(list));
+    toast.success("Student registered successfully");
+    setStudent({ gender: "Male", className: "Class 7" });
+    setFaceImage(null);
+  };
+
   return (
     <AppLayout>
       <div className="mx-auto max-w-5xl space-y-6">
-        <StudentInfo />
-        <FaceCapture />
+        <StudentInfo value={student} onChange={setStudent} />
+        <FaceCapture value={faceImage} onChange={setFaceImage} />
         <div className="flex justify-end gap-3">
-          <Button variant="outline">Cancel</Button>
-          <Button className="gap-2">
+          <Button variant="outline" onClick={() => { setStudent({ gender: "Male", className: "Class 7" }); setFaceImage(null); }}>Cancel</Button>
+          <Button className="gap-2" onClick={save}>
             <span>Save & Register Student</span>
           </Button>
         </div>
@@ -28,7 +45,7 @@ function Row({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>;
 }
 
-function StudentInfo() {
+function StudentInfo({ value, onChange }: { value: any; onChange: (v: any) => void }) {
   return (
     <Card>
       <CardHeader>
@@ -39,17 +56,17 @@ function StudentInfo() {
         <Row>
           <div>
             <Label htmlFor="name">Student Name</Label>
-            <Input id="name" placeholder="Enter student's full name" />
+            <Input id="name" placeholder="Enter student's full name" value={value.name || ""} onChange={(e) => onChange({ ...value, name: e.target.value })} />
           </div>
           <div>
             <Label htmlFor="dob">Date of Birth</Label>
-            <Input id="dob" type="date" />
+            <Input id="dob" type="date" value={value.dob || ""} onChange={(e) => onChange({ ...value, dob: e.target.value })} />
           </div>
         </Row>
         <Row>
           <div>
             <Label>Gender</Label>
-            <RadioGroup defaultValue="Male" className="mt-2 flex gap-6">
+            <RadioGroup value={value.gender} onValueChange={(v) => onChange({ ...value, gender: v })} className="mt-2 flex gap-6">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="Male" id="male" />
                 <Label htmlFor="male">Male</Label>
@@ -66,7 +83,7 @@ function StudentInfo() {
           </div>
           <div>
             <Label>Class/Grade</Label>
-            <Select defaultValue="Class 7">
+            <Select value={value.className} onValueChange={(v) => onChange({ ...value, className: v })}>
               <SelectTrigger className="mt-2">
                 <SelectValue placeholder="Select class" />
               </SelectTrigger>
@@ -74,6 +91,7 @@ function StudentInfo() {
                 {Array.from({ length: 12 }, (_, i) => (
                   <SelectItem key={i} value={`Class ${i + 1}`}>{`Class ${i + 1}`}</SelectItem>
                 ))}
+                <SelectItem value="12th">12th</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -81,21 +99,21 @@ function StudentInfo() {
         <Row>
           <div>
             <Label htmlFor="roll">Roll Number</Label>
-            <Input id="roll" placeholder="Enter roll number" />
+            <Input id="roll" placeholder="Enter roll number" value={value.roll || ""} onChange={(e) => onChange({ ...value, roll: e.target.value })} />
           </div>
           <div>
             <Label htmlFor="parent">Parent/Guardian Name</Label>
-            <Input id="parent" placeholder="Enter parent's full name" />
+            <Input id="parent" placeholder="Enter parent's full name" value={value.parent || ""} onChange={(e) => onChange({ ...value, parent: e.target.value })} />
           </div>
         </Row>
         <Row>
           <div>
             <Label htmlFor="phone">Parent Contact Number</Label>
-            <Input id="phone" placeholder="e.g., +1234567890" />
+            <Input id="phone" placeholder="e.g., +1234567890" value={value.phone || ""} onChange={(e) => onChange({ ...value, phone: e.target.value })} />
           </div>
           <div>
             <Label htmlFor="email">Parent Email (Optional)</Label>
-            <Input id="email" type="email" placeholder="e.g., parent@example.com" />
+            <Input id="email" type="email" placeholder="e.g., parent@example.com" value={value.email || ""} onChange={(e) => onChange({ ...value, email: e.target.value })} />
           </div>
         </Row>
       </CardContent>
@@ -103,10 +121,10 @@ function StudentInfo() {
   );
 }
 
-function FaceCapture() {
+function FaceCapture({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<string | null>(value);
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -146,6 +164,7 @@ function FaceCapture() {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const data = canvas.toDataURL("image/png");
     setImage(data);
+    onChange(data);
     stopStream();
   };
 
@@ -153,7 +172,7 @@ function FaceCapture() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => setImage(reader.result as string);
+    reader.onload = () => { const d = reader.result as string; setImage(d); onChange(d); };
     reader.readAsDataURL(file);
   };
 
@@ -197,7 +216,7 @@ function FaceCapture() {
           )}
           <Input type="file" accept="image/*" onChange={onFile} className="max-w-xs" />
           {image && (
-            <Button variant="outline" onClick={() => setImage(null)}>
+            <Button variant="outline" onClick={() => { setImage(null); onChange(null); }}>
               Retake
             </Button>
           )}
