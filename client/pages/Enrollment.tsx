@@ -11,15 +11,23 @@ import { toast } from "sonner";
 export default function Enrollment() {
   const [student, setStudent] = useState<any>({ gender: "Male", className: "Class 7" });
   const [faceImage, setFaceImage] = useState<string | null>(null);
+  const profRaw = typeof window !== 'undefined' ? localStorage.getItem('school.profile') : null;
+  const profile = profRaw ? JSON.parse(profRaw) : null;
+  const schoolId = profile?.schoolId || 'SCHOOL';
 
   const save = () => {
     if (!student.name || !student.roll) {
       toast.error("Please complete required fields: name and roll number.");
       return;
     }
+    const entry = { ...student, faceImage };
     const list = JSON.parse(localStorage.getItem("students") || "[]");
-    list.push({ ...student, faceImage });
+    list.push(entry);
     localStorage.setItem("students", JSON.stringify(list));
+    const key = `students:${schoolId}`;
+    const slist = JSON.parse(localStorage.getItem(key) || "[]");
+    slist.push(entry);
+    localStorage.setItem(key, JSON.stringify(slist));
     toast.success("Student registered successfully");
     setStudent({ gender: "Male", className: "Class 7" });
     setFaceImage(null);
