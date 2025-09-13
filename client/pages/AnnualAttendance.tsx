@@ -27,9 +27,11 @@ export default function AnnualAttendance() {
   const { profile } = useAuth();
   const myDo = profile?.doId || localStorage.getItem("do.id") || "DO";
   const mySchool = profile?.schoolId || "SCHOOL";
-  const [selectedSchool, setSelectedSchool] = useState<string>(mySchool);
-  const schools: any[] = JSON.parse(localStorage.getItem("schools") || "[]");
-  const scopeDoId = (schools.find((s)=>s.schoolId===selectedSchool)?.doId) || myDo;
+  const schoolsRaw: any[] = JSON.parse(localStorage.getItem("schools") || "[]");
+  const schools = schoolsRaw.filter((s:any)=>s && s.schoolId && String(s.schoolId).trim() !== "");
+  const defaultSchool = (localStorage.getItem("auth.role") === "do") ? (schools[0]?.schoolId || mySchool) : mySchool;
+  const [selectedSchool, setSelectedSchool] = useState<string>(defaultSchool);
+  const scopeDoId = (schools.find((s:any)=>s.schoolId===selectedSchool)?.doId) || myDo;
   const scopeSchoolId = selectedSchool;
   const [cls, setCls] = useState<string>("Class 7");
   const [year, setYear] = useState<number>(now.getFullYear());
