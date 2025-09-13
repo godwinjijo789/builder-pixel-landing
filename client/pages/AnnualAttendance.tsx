@@ -24,6 +24,9 @@ function parseTimeToMinutes(t: string) {
 
 export default function AnnualAttendance() {
   const now = new Date();
+  const { profile } = useAuth();
+  const doId = profile?.doId || localStorage.getItem("do.id") || "DO";
+  const schoolId = profile?.schoolId || "SCHOOL";
   const [cls, setCls] = useState<string>("Class 7");
   const [year, setYear] = useState<number>(now.getFullYear());
   const [monthIndex, setMonthIndex] = useState<number>(now.getMonth());
@@ -49,7 +52,7 @@ export default function AnnualAttendance() {
 
   const getStatus = (studentId: string, d: number): "P" | "A" | "" => {
     const date = fmtDate(year, monthIndex, d);
-    const key = `attendance:${date}:${cls}`;
+    const key = `attendance:${doId}:${schoolId}:${date}:${cls}`;
     const rec: Record<string, boolean> = JSON.parse(localStorage.getItem(key) || "{}");
     if (rec[studentId]) return "P";
     const todayStr = fmtDate(now.getFullYear(), now.getMonth(), now.getDate());
@@ -63,7 +66,7 @@ export default function AnnualAttendance() {
 
   const toggleCell = (studentId: string, d: number) => {
     const date = fmtDate(year, monthIndex, d);
-    const key = `attendance:${date}:${cls}`;
+    const key = `attendance:${doId}:${schoolId}:${date}:${cls}`;
     const rec: Record<string, boolean> = JSON.parse(localStorage.getItem(key) || "{}");
     const status = rec[studentId] === true ? "P" : getStatus(studentId, d);
     if (status === "P") {
@@ -102,7 +105,7 @@ export default function AnnualAttendance() {
             <div className="flex items-center gap-2 border rounded-md px-2 py-1 bg-background">
               <span className="text-xs text-muted-foreground">Window</span>
               <Input type="time" value={startTime} onChange={(e)=>setStartTime(e.target.value)} className="w-28" />
-              <span className="text-muted-foreground">–</span>
+              <span className="text-muted-foreground">��</span>
               <Input type="time" value={endTime} onChange={(e)=>setEndTime(e.target.value)} className="w-28" />
               <Button onClick={saveWindow} size="sm" className="ml-1">Save</Button>
             </div>
