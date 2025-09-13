@@ -36,7 +36,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Protected><Index /></Protected>} />
+            <Route path="/" element={<Protected>{/* Role-based landing */}<RoleHome /></Protected>} />
             <Route path="/enrollment" element={<Protected><Enrollment /></Protected>} />
             <Route path="/alerts" element={<Protected><Alerts /></Protected>} />
             <Route path="/status" element={<Protected><SystemStatus /></Protected>} />
