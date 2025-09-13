@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 export default function DOOffice() {
   const { role } = useAuth();
   const [schools, setSchools] = useState<SchoolProfile[]>([]);
+  const [q, setQ] = useState("");
   const doId = localStorage.getItem("do.id") || "";
 
   useEffect(() => {
