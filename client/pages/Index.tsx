@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrendingDown, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bar,
@@ -62,6 +63,7 @@ const initialFeed = [
 export default function Index() {
   const [feed, setFeed] = useState(initialFeed);
   const timerRef = useRef<number | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (timerRef.current) return;
@@ -137,7 +139,7 @@ export default function Index() {
           <Card>
             <CardHeader className="flex-row items-center justify-between">
               <CardTitle className="text-base">Absenteeism/Proxy Alerts</CardTitle>
-              <Button variant="ghost" size="sm">View All</Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/alerts')}>View All</Button>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
@@ -163,7 +165,7 @@ export default function Index() {
         <Card>
           <CardHeader className="flex-row items-center justify-between">
             <CardTitle className="text-base">Real-time Attendance Feed</CardTitle>
-            <Button variant="ghost" size="sm">Refresh</Button>
+            <Button variant="ghost" size="sm" onClick={() => setFeed(shuffleFeed())}>Refresh</Button>
           </CardHeader>
           <CardContent>
             <ul className="divide-y">
@@ -185,6 +187,15 @@ export default function Index() {
       </div>
     </AppLayout>
   );
+}
+
+function shuffleFeed() {
+  return Array.from({ length: 4 }, () => ({
+    name: randomName(),
+    id: `S${Math.floor(Math.random()*9000)+1000}`,
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    status: Math.random() > 0.15 ? 'Present' : 'Absent',
+  }));
 }
 
 function randomName() {
