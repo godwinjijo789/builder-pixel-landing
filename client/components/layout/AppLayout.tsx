@@ -26,7 +26,7 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Bell, Gauge, Layers, Settings, UserPlus, CalendarDays, CheckSquare, Building2 } from "lucide-react";
+import { Bell, Gauge, Layers, Settings, UserPlus, CalendarDays, CheckSquare, Building2, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth";
 
@@ -74,9 +74,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               <SidebarMenu>
                 <NavLink to="/" label="Dashboard" icon={Gauge} />
                 <NavLink to="/enrollment" label="Student Enrollment" icon={UserPlus} hidden={role === 'do'} />
-                <NavLink to="/alerts" label="Parent Alerts" icon={Bell} />
+                <NavLink to="/alerts" label="Parent Alerts" icon={Bell} hidden={role==='do'} />
                 <NavLink to="/status" label="System Status" icon={Layers} />
                 <NavLink to="/annual" label="Annual Attendance" icon={CalendarDays} />
+                <NavLink to="/students" label="Students" icon={Users} hidden={role==='do'} />
                 <NavLink to="/manual" label="Manual Attendance" icon={CheckSquare} hidden={role === 'do'} />
                 <NavLink to="/do-office" label="DO Office" icon={Building2} hidden={role !== 'do'} />
               </SidebarMenu>
