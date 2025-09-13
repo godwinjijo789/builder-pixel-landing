@@ -88,10 +88,9 @@ function StudentInfo({ value, onChange }: { value: any; onChange: (v: any) => vo
                 <SelectValue placeholder="Select class" />
               </SelectTrigger>
               <SelectContent>
-                {Array.from({ length: 12 }, (_, i) => (
+                {Array.from({ length: 11 }, (_, i) => (
                   <SelectItem key={i} value={`Class ${i + 1}`}>{`Class ${i + 1}`}</SelectItem>
                 ))}
-                <SelectItem value="12th">12th</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -102,8 +101,18 @@ function StudentInfo({ value, onChange }: { value: any; onChange: (v: any) => vo
             <Input id="roll" placeholder="Enter roll number" value={value.roll || ""} onChange={(e) => onChange({ ...value, roll: e.target.value })} />
           </div>
           <div>
+            <Label htmlFor="section">Section</Label>
+            <Input id="section" placeholder="e.g., A / B / C" value={value.section || ""} onChange={(e) => onChange({ ...value, section: e.target.value })} />
+          </div>
+        </Row>
+        <Row>
+          <div>
             <Label htmlFor="parent">Parent/Guardian Name</Label>
             <Input id="parent" placeholder="Enter parent's full name" value={value.parent || ""} onChange={(e) => onChange({ ...value, parent: e.target.value })} />
+          </div>
+          <div>
+            <Label htmlFor="phone">Parent Contact Number</Label>
+            <Input id="phone" placeholder="e.g., +1234567890" value={value.phone || ""} onChange={(e) => onChange({ ...value, phone: e.target.value })} />
           </div>
         </Row>
         <Row>
