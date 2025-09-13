@@ -13,6 +13,7 @@ import SystemStatus from "./pages/SystemStatus";
 import AnnualAttendance from "./pages/AnnualAttendance";
 import ManualAttendance from "./pages/ManualAttendance";
 import DOOffice from "./pages/DOOffice";
+import Students from "./pages/Students";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "@/context/auth";
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/status" element={<Protected><SystemStatus /></Protected>} />
             <Route path="/annual" element={<Protected><AnnualAttendance /></Protected>} />
             <Route path="/manual" element={<Protected><ManualAttendance /></Protected>} />
+            <Route path="/students" element={<Protected><Students /></Protected>} />
             <Route path="/do-office" element={<Protected><DOOffice /></Protected>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

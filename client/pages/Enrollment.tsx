@@ -88,7 +88,7 @@ function StudentInfo({ value, onChange }: { value: any; onChange: (v: any) => vo
                 <SelectValue placeholder="Select class" />
               </SelectTrigger>
               <SelectContent>
-                {Array.from({ length: 11 }, (_, i) => (
+                {Array.from({ length: 12 }, (_, i) => (
                   <SelectItem key={i} value={`Class ${i + 1}`}>{`Class ${i + 1}`}</SelectItem>
                 ))}
               </SelectContent>
