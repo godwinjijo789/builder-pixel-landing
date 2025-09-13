@@ -14,13 +14,14 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"school" | "do">("school");
   const [doId, setDoId] = useState("");
+  const [schoolId, setSchoolId] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const ok = await login({ username, password, role, doId: role === "do" ? doId : undefined });
+    const ok = await login({ username, password, role, doId: role === "do" ? doId : undefined, schoolId: role === "school" ? schoolId : undefined });
     setLoading(false);
     if (ok) {
       toast.success("Welcome back");
@@ -58,6 +59,12 @@ export default function Login() {
               <label className="text-sm">Password</label>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="password" />
             </div>
+            {role === "school" && (
+              <div>
+                <label className="text-sm">School ID</label>
+                <Input value={schoolId} onChange={(e)=>setSchoolId(e.target.value)} placeholder="e.g., SCH-001" />
+              </div>
+            )}
             {role === "do" && (
               <div>
                 <label className="text-sm">DO Office ID</label>
