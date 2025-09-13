@@ -61,6 +61,13 @@ export default function ManualAttendance() {
                 </label>
               ))}
             </div>
+            <div className="mt-4">
+              <div className="text-sm font-medium mb-2">Absentees Today</div>
+              <div className="rounded-md border p-3 text-sm">
+                {students.filter(s=>!present[s.id]).map((s)=> (<div key={s.id}>• {s.name} (ID: {s.id})</div>))}
+                {students.filter(s=>!present[s.id]).length===0 && (<div className="text-muted-foreground">No absentees</div>)}
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
