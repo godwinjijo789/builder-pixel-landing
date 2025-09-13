@@ -28,12 +28,15 @@ export default function DOOffice() {
   return (
     <AppLayout>
       <div className="grid gap-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           <h1 className="text-xl font-semibold">DO Office • Schools Overview</h1>
-          <AddSchool onAdded={() => {
+          <div className="flex gap-2 items-center ml-auto">
+            <Input placeholder="Search schools" value={q} onChange={(e)=>setQ(e.target.value)} className="w-56" />
+            <AddSchool onAdded={() => {
             const list: SchoolProfile[] = JSON.parse(localStorage.getItem("schools") || "[]");
             setSchools(list.filter((s) => !doId || s.doId === doId));
           }} />
+          </div>
         </div>
         <Card>
           <CardHeader>
@@ -50,6 +53,7 @@ export default function DOOffice() {
                     <th className="text-left p-2">Address</th>
                     <th className="text-left p-2">DO Office ID</th>
                     <th className="text-left p-2">Present Today</th>
+                    <th className="text-left p-2">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -61,6 +65,7 @@ export default function DOOffice() {
                       <td className="p-2">{s.address}</td>
                       <td className="p-2">{s.doId}</td>
                       <td className="p-2">{s.totalPresent}</td>
+                      <td className="p-2"><StudentsDialog schoolId={s.schoolId} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -70,6 +75,31 @@ export default function DOOffice() {
         </Card>
       </div>
     </AppLayout>
+  );
+}
+
+function StudentsDialog({ schoolId }: { schoolId: string }) {
+  const [open, setOpen] = useState(false);
+  const list = JSON.parse(localStorage.getItem(`students:${schoolId}`) || "[]");
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">View Students</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Students • {schoolId}</DialogTitle></DialogHeader>
+        <div className="max-h-[60vh] overflow-auto rounded-md border">
+          <table className="min-w-[600px] w-full">
+            <thead className="bg-muted/50 text-sm"><tr><th className="p-2 text-left">Roll</th><th className="p-2 text-left">Name</th><th className="p-2 text-left">Class</th><th className="p-2 text-left">Section</th></tr></thead>
+            <tbody>
+              {list.map((s: any, i: number) => (
+                <tr key={i} className="odd:bg-background even:bg-muted/20"><td className="p-2">{s.roll}</td><td className="p-2">{s.name}</td><td className="p-2">{s.className}</td><td className="p-2">{s.section}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
