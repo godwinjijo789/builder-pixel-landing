@@ -45,13 +45,18 @@ export default function AnnualAttendance() {
     const list = (stored.filter((s: any) => !s.className || s.className === cls) as any[]).map((s: any, i: number) => ({ name: s.name || `Student ${i + 1}`, id: s.roll || String(i + 1).padStart(3, "0") }));
     setStudents(list.length ? list : Array.from({ length: 12 }, (_, i) => ({ name: `Student ${i + 1}`, id: String(i + 1).padStart(3, "0") })));
     // load window per class
-    setStartTime(localStorage.getItem(`window:${cls}:start`) || "08:30");
-    setEndTime(localStorage.getItem(`window:${cls}:end`) || "10:00");
+    const s = localStorage.getItem(`window:${cls}:start`) || localStorage.getItem(`window:school:${scopeSchoolId}:start`) || "08:30";
+    const e = localStorage.getItem(`window:${cls}:end`) || localStorage.getItem(`window:school:${scopeSchoolId}:end`) || "10:00";
+    setStartTime(s as string);
+    setEndTime(e as string);
   }, [cls]);
 
   const saveWindow = () => {
     localStorage.setItem(`window:${cls}:start`, startTime);
     localStorage.setItem(`window:${cls}:end`, endTime);
+    // Also save school-wide defaults if not set
+    localStorage.setItem(`window:school:${scopeSchoolId}:start`, startTime);
+    localStorage.setItem(`window:school:${scopeSchoolId}:end`, endTime);
   };
 
   const getStatus = (studentId: string, d: number): "P" | "A" | "" => {
