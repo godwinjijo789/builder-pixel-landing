@@ -37,7 +37,7 @@ export default function AnnualAttendance() {
 
   useEffect(() => {
     // refresh students when class changes
-    const stored = JSON.parse(localStorage.getItem("students") || "[]");
+    const stored = JSON.parse(localStorage.getItem(`students:${schoolId}`) || localStorage.getItem("students") || "[]");
     const list = (stored.filter((s: any) => !s.className || s.className === cls) as any[]).map((s: any, i: number) => ({ name: s.name || `Student ${i + 1}`, id: s.roll || String(i + 1).padStart(3, "0") }));
     setStudents(list.length ? list : Array.from({ length: 12 }, (_, i) => ({ name: `Student ${i + 1}`, id: String(i + 1).padStart(3, "0") })));
     // load window per class
@@ -105,7 +105,7 @@ export default function AnnualAttendance() {
             <div className="flex items-center gap-2 border rounded-md px-2 py-1 bg-background">
               <span className="text-xs text-muted-foreground">Window</span>
               <Input type="time" value={startTime} onChange={(e)=>setStartTime(e.target.value)} className="w-28" />
-              <span className="text-muted-foreground">��</span>
+              <span className="text-muted-foreground">–</span>
               <Input type="time" value={endTime} onChange={(e)=>setEndTime(e.target.value)} className="w-28" />
               <Button onClick={saveWindow} size="sm" className="ml-1">Save</Button>
             </div>
