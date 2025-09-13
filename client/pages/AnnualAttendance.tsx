@@ -25,8 +25,12 @@ function parseTimeToMinutes(t: string) {
 export default function AnnualAttendance() {
   const now = new Date();
   const { profile } = useAuth();
-  const doId = profile?.doId || localStorage.getItem("do.id") || "DO";
-  const schoolId = profile?.schoolId || "SCHOOL";
+  const myDo = profile?.doId || localStorage.getItem("do.id") || "DO";
+  const mySchool = profile?.schoolId || "SCHOOL";
+  const [selectedSchool, setSelectedSchool] = useState<string>(mySchool);
+  const schools: any[] = JSON.parse(localStorage.getItem("schools") || "[]");
+  const scopeDoId = (schools.find((s)=>s.schoolId===selectedSchool)?.doId) || myDo;
+  const scopeSchoolId = selectedSchool;
   const [cls, setCls] = useState<string>("Class 7");
   const [year, setYear] = useState<number>(now.getFullYear());
   const [monthIndex, setMonthIndex] = useState<number>(now.getMonth());
@@ -37,7 +41,7 @@ export default function AnnualAttendance() {
 
   useEffect(() => {
     // refresh students when class changes
-    const stored = JSON.parse(localStorage.getItem(`students:${schoolId}`) || localStorage.getItem("students") || "[]");
+    const stored = JSON.parse(localStorage.getItem(`students:${scopeSchoolId}`) || localStorage.getItem("students") || "[]");
     const list = (stored.filter((s: any) => !s.className || s.className === cls) as any[]).map((s: any, i: number) => ({ name: s.name || `Student ${i + 1}`, id: s.roll || String(i + 1).padStart(3, "0") }));
     setStudents(list.length ? list : Array.from({ length: 12 }, (_, i) => ({ name: `Student ${i + 1}`, id: String(i + 1).padStart(3, "0") })));
     // load window per class
@@ -52,7 +56,7 @@ export default function AnnualAttendance() {
 
   const getStatus = (studentId: string, d: number): "P" | "A" | "" => {
     const date = fmtDate(year, monthIndex, d);
-    const key = `attendance:${doId}:${schoolId}:${date}:${cls}`;
+    const key = `attendance:${scopeDoId}:${scopeSchoolId}:${date}:${cls}`;
     const rec: Record<string, boolean> = JSON.parse(localStorage.getItem(key) || "{}");
     if (rec[studentId]) return "P";
     const todayStr = fmtDate(now.getFullYear(), now.getMonth(), now.getDate());
@@ -66,7 +70,7 @@ export default function AnnualAttendance() {
 
   const toggleCell = (studentId: string, d: number) => {
     const date = fmtDate(year, monthIndex, d);
-    const key = `attendance:${doId}:${schoolId}:${date}:${cls}`;
+    const key = `attendance:${scopeDoId}:${scopeSchoolId}:${date}:${cls}`;
     const rec: Record<string, boolean> = JSON.parse(localStorage.getItem(key) || "{}");
     const status = rec[studentId] === true ? "P" : getStatus(studentId, d);
     if (status === "P") {
@@ -85,6 +89,15 @@ export default function AnnualAttendance() {
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <h1 className="text-xl font-semibold">Annual Attendance</h1>
           <div className="flex gap-2 flex-wrap">
+            {/* If DO role, allow picking school */}
+            {localStorage.getItem("auth.role") === "do" && (
+              <Select value={selectedSchool} onValueChange={setSelectedSchool}>
+                <SelectTrigger className="w-44"><SelectValue placeholder="School" /></SelectTrigger>
+                <SelectContent>
+                  {schools.map((s)=> (<SelectItem key={s.schoolId} value={s.schoolId}>{s.name || s.schoolId}</SelectItem>))}
+                </SelectContent>
+              </Select>
+            )}
             <Select value={cls} onValueChange={setCls}>
               <SelectTrigger className="w-36"><SelectValue placeholder="Class" /></SelectTrigger>
               <SelectContent>
@@ -114,7 +127,7 @@ export default function AnnualAttendance() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{months[monthIndex]} {year} • {cls}</CardTitle>
+            <CardTitle className="text-base">{months[monthIndex]} {year} • {cls} • {scopeSchoolId}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-auto border rounded-md">
