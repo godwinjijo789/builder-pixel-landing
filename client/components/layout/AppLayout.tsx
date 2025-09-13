@@ -80,6 +80,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 <NavLink to="/students" label="Students" icon={Users} hidden={role==='do'} />
                 <NavLink to="/manual" label="Manual Attendance" icon={CheckSquare} hidden={role === 'do'} />
                 <NavLink to="/do-office" label="DO Office" icon={Building2} hidden={role !== 'do'} />
+                <NavLink to="/auto-windows" label="Auto Windows" icon={Layers} hidden={role !== 'do'} />
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
