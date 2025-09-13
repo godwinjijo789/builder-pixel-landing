@@ -27,6 +27,11 @@ function Protected({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function RoleHome() {
+  const { role } = useAuth();
+  return role === 'do' ? <DOOffice /> : <Index />;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
