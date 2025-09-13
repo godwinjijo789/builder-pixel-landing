@@ -18,7 +18,7 @@ export default function DOOffice() {
   }, [doId]);
 
   const today = new Date().toISOString().slice(0,10);
-  const rows = useMemo(() => schools.map((s) => {
+  const rows = useMemo(() => schools.filter((s)=>`${s.name} ${s.schoolId} ${s.district}`.toLowerCase().includes(q.toLowerCase())).map((s) => {
     const totalPresent = Object.keys(localStorage)
       .filter((k) => k.startsWith(`attendance:${s.doId}:${s.schoolId}:${today}:`))
       .reduce((acc, key) => acc + Object.values(JSON.parse(localStorage.getItem(key) || "{}") as Record<string, boolean>).filter(Boolean).length, 0);
