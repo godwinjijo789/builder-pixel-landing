@@ -18,7 +18,7 @@ export default function ManualAttendance() {
   const [present, setPresent] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("students") || "[]");
+    const stored = JSON.parse(localStorage.getItem(`students:${schoolId}`) || localStorage.getItem("students") || "[]");
     const list = (stored.filter((s: any) => !s.className || s.className === cls) as any[]).map((s, i) => ({ name: s.name || `Student ${i+1}`, id: s.roll || String(i+1).padStart(3,"0") }));
     setStudents(list.length ? list : Array.from({length: 10}, (_,i)=>({name:`Student ${i+1}`, id:String(i+1).padStart(3,'0')})));
     setPresent({});
