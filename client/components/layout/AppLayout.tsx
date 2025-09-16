@@ -73,7 +73,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <SidebarGroupContent>
               <SidebarMenu>
                 <NavLink to="/" label="Dashboard" icon={Gauge} />
-                <NavLink to="/enrollment" label="Student Enrollment" icon={UserPlus} hidden={role === 'do'} />
+                <NavLink to="/enrollment" label="Student Enrollment" icon={UserPlus} />
                 <NavLink to="/alerts" label="Parent Alerts" icon={Bell} hidden={role==='do'} />
                 <NavLink to="/status" label="System Status" icon={Layers} />
                 <NavLink to="/cctv" label="CCTV Cameras" icon={Video} hidden={role==='do'} />

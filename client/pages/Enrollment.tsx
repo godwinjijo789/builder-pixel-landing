@@ -7,19 +7,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/context/auth";
 
 export default function Enrollment() {
+  const { role, profile } = useAuth();
   const [student, setStudent] = useState<any>({ gender: "Male", className: "Class 7" });
   const [faceImage, setFaceImage] = useState<string | null>(null);
-  const profRaw = typeof window !== 'undefined' ? localStorage.getItem('school.profile') : null;
-  const profile = profRaw ? JSON.parse(profRaw) : null;
-  const schoolId = profile?.schoolId || 'SCHOOL';
+  const schoolList: any[] = JSON.parse(localStorage.getItem("schools") || "[]");
+  const [targetSchool, setTargetSchool] = useState<string>(profile?.schoolId || schoolList[0]?.schoolId || "");
 
-  const save = () => {
+  const getImageDims = (dataUrl: string) => new Promise<{w:number;h:number}>((resolve) => { const img = new Image(); img.onload = () => resolve({ w: img.width, h: img.height }); img.src = dataUrl; });
+
+  const save = async () => {
     if (!student.name || !student.roll) {
       toast.error("Please complete required fields: name and roll number.");
       return;
     }
+    const schoolId = role === 'school' ? (profile?.schoolId || 'SCHOOL') : targetSchool;
+    if (!schoolId) { toast.error("Select a school to save this student."); return; }
+    if (!faceImage) { toast.error("Capture a clear face image before saving."); return; }
+    const { w, h } = await getImageDims(faceImage);
+    if (w < 200 || h < 200) { toast.error("Face image too small. Capture a clearer image."); return; }
+
     const entry = { ...student, faceImage };
     const list = JSON.parse(localStorage.getItem("students") || "[]");
     list.push(entry);
@@ -28,6 +37,9 @@ export default function Enrollment() {
     const slist = JSON.parse(localStorage.getItem(key) || "[]");
     slist.push(entry);
     localStorage.setItem(key, JSON.stringify(slist));
+
+    try { await fetch('/api/students', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ schoolId, student: entry }) }); } catch {}
+
     toast.success("Student registered successfully");
     setStudent({ gender: "Male", className: "Class 7" });
     setFaceImage(null);
@@ -36,6 +48,19 @@ export default function Enrollment() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-5xl space-y-6">
+        {role === 'do' && (
+          <Card>
+            <CardHeader><CardTitle className="text-base">Target School</CardTitle></CardHeader>
+            <CardContent>
+              <Select value={targetSchool} onValueChange={setTargetSchool}>
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select school" /></SelectTrigger>
+                <SelectContent>
+                  {schoolList.map((s)=> (<SelectItem key={s.schoolId} value={s.schoolId}>{s.name || s.schoolId}</SelectItem>))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+        )}
         <StudentInfo value={student} onChange={setStudent} />
         <FaceCapture value={faceImage} onChange={setFaceImage} />
         <div className="flex justify-end gap-3">
