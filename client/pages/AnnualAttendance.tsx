@@ -29,10 +29,15 @@ export default function AnnualAttendance() {
   const mySchool = profile?.schoolId || "SCHOOL";
   const schoolsRaw: any[] = JSON.parse(localStorage.getItem("schools") || "[]");
   const schools = schoolsRaw.filter((s:any)=>s && s.schoolId && String(s.schoolId).trim() !== "");
-  const defaultSchool = (localStorage.getItem("auth.role") === "do") ? (schools[0]?.schoolId || mySchool) : mySchool;
+  const defaultSchool = (localStorage.getItem("auth.role") === "do") ? (schools[0]?.schoolId || "") : mySchool;
   const [selectedSchool, setSelectedSchool] = useState<string>(defaultSchool);
+  useEffect(() => {
+    if (localStorage.getItem("auth.role") === "do") {
+      if (!selectedSchool && schools.length > 0) setSelectedSchool(schools[0].schoolId);
+    }
+  }, [schools, selectedSchool]);
   const scopeDoId = (schools.find((s:any)=>s.schoolId===selectedSchool)?.doId) || myDo;
-  const scopeSchoolId = selectedSchool;
+  const scopeSchoolId = selectedSchool || mySchool;
   const [cls, setCls] = useState<string>("Class 7");
   const [year, setYear] = useState<number>(now.getFullYear());
   const [monthIndex, setMonthIndex] = useState<number>(now.getMonth());
@@ -108,7 +113,7 @@ export default function AnnualAttendance() {
             <Select value={cls} onValueChange={setCls}>
               <SelectTrigger className="w-36"><SelectValue placeholder="Class" /></SelectTrigger>
               <SelectContent>
-                {Array.from({ length: 12 }, (_, i) => (
+                {Array.from({ length: 11 }, (_, i) => (
                   <SelectItem key={i} value={`Class ${i + 1}`}>{`Class ${i + 1}`}</SelectItem>
                 ))}
               </SelectContent>
