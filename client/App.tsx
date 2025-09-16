@@ -15,6 +15,7 @@ import ManualAttendance from "./pages/ManualAttendance";
 import DOOffice from "./pages/DOOffice";
 import Students from "./pages/Students";
 import AutoWindows from "./pages/AutoWindows";
+import CCTV from "./pages/CCTV";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "@/context/auth";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/annual" element={<Protected><AnnualAttendance /></Protected>} />
             <Route path="/manual" element={<Protected><ManualAttendance /></Protected>} />
             <Route path="/students" element={<Protected><Students /></Protected>} />
+            <Route path="/cctv" element={<Protected><CCTV /></Protected>} />
             <Route path="/do-office" element={<Protected><DOOffice /></Protected>} />
             <Route path="/auto-windows" element={<Protected><AutoWindows /></Protected>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
