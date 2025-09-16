@@ -35,30 +35,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async ({ username, password, role, doId, schoolId }: { username: string; password: string; role: Role; doId?: string; schoolId?: string; }) => {
-    const ok = username.trim().toLowerCase() === "admin" && password === "password";
-    if (ok) {
-      localStorage.setItem("auth.admin", "true");
-      localStorage.setItem("auth.role", role);
-      if (role === "do" && doId) localStorage.setItem("do.id", doId);
-      setIsAuthenticated(true);
-      setRole(role);
-      if (role === "school" && schoolId) {
-        const prof: SchoolProfile = {
-          name: (profile?.name || ""),
-          schoolId,
-          district: profile?.district || "",
-          address: profile?.address || "",
-          doId: profile?.doId || localStorage.getItem("do.id") || "",
-        };
-        localStorage.setItem("school.profile", JSON.stringify(prof));
-        setProfile(prof);
-        const list: SchoolProfile[] = JSON.parse(localStorage.getItem("schools") || "[]");
-        const idx = list.findIndex((s) => s.schoolId === prof.schoolId);
-        if (idx >= 0) list[idx] = prof; else list.push(prof);
-        localStorage.setItem("schools", JSON.stringify(list));
-      }
+    const credsOk = username.trim().toLowerCase() === "admin" && password === "password";
+    if (!credsOk) return false;
+
+    if (role === "do") {
+      if (!doId || !doId.trim()) return false;
     }
-    return ok;
+    if (role === "school") {
+      if (!schoolId || !schoolId.trim()) return false;
+    }
+
+    localStorage.setItem("auth.admin", "true");
+    localStorage.setItem("auth.role", role);
+    if (role === "do" && doId) localStorage.setItem("do.id", doId);
+    setIsAuthenticated(true);
+    setRole(role);
+
+    if (role === "school" && schoolId) {
+      const prof: SchoolProfile = {
+        name: (profile?.name || ""),
+        schoolId,
+        district: profile?.district || "",
+        address: profile?.address || "",
+        doId: profile?.doId || localStorage.getItem("do.id") || "",
+      };
+      localStorage.setItem("school.profile", JSON.stringify(prof));
+      setProfile(prof);
+      const list: SchoolProfile[] = JSON.parse(localStorage.getItem("schools") || "[]");
+      const idx = list.findIndex((s) => s.schoolId === prof.schoolId);
+      if (idx >= 0) list[idx] = prof; else list.push(prof);
+      localStorage.setItem("schools", JSON.stringify(list));
+    }
+
+    return true;
   };
 
   const logout = () => {
