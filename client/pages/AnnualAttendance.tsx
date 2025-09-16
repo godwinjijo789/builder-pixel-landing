@@ -1,7 +1,13 @@
 import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -28,32 +34,69 @@ export default function AnnualAttendance() {
   const myDo = profile?.doId || localStorage.getItem("do.id") || "DO";
   const mySchool = profile?.schoolId || "SCHOOL";
   const schoolsRaw: any[] = JSON.parse(localStorage.getItem("schools") || "[]");
-  const schools = schoolsRaw.filter((s:any)=>s && s.schoolId && String(s.schoolId).trim() !== "");
-  const defaultSchool = (localStorage.getItem("auth.role") === "do") ? (schools[0]?.schoolId || "") : mySchool;
+  const schools = schoolsRaw.filter(
+    (s: any) => s && s.schoolId && String(s.schoolId).trim() !== "",
+  );
+  const defaultSchool =
+    localStorage.getItem("auth.role") === "do"
+      ? schools[0]?.schoolId || ""
+      : mySchool;
   const [selectedSchool, setSelectedSchool] = useState<string>(defaultSchool);
   useEffect(() => {
     if (localStorage.getItem("auth.role") === "do") {
-      if (!selectedSchool && schools.length > 0) setSelectedSchool(schools[0].schoolId);
+      if (!selectedSchool && schools.length > 0)
+        setSelectedSchool(schools[0].schoolId);
     }
   }, [schools, selectedSchool]);
-  const scopeDoId = (schools.find((s:any)=>s.schoolId===selectedSchool)?.doId) || myDo;
+  const scopeDoId =
+    schools.find((s: any) => s.schoolId === selectedSchool)?.doId || myDo;
   const scopeSchoolId = selectedSchool || mySchool;
   const [cls, setCls] = useState<string>("Class 7");
   const [year, setYear] = useState<number>(now.getFullYear());
   const [monthIndex, setMonthIndex] = useState<number>(now.getMonth());
-  const [startTime, setStartTime] = useState<string>(() => localStorage.getItem(`window:${cls}:start`) || "08:30");
-  const [endTime, setEndTime] = useState<string>(() => localStorage.getItem(`window:${cls}:end`) || "10:00");
+  const [startTime, setStartTime] = useState<string>(
+    () => localStorage.getItem(`window:${cls}:start`) || "08:30",
+  );
+  const [endTime, setEndTime] = useState<string>(
+    () => localStorage.getItem(`window:${cls}:end`) || "10:00",
+  );
   const [students, setStudents] = useState<{ name: string; id: string }[]>([]);
-  const days = useMemo(() => Array.from({ length: daysInMonth(year, monthIndex) }, (_, i) => i + 1), [year, monthIndex]);
+  const days = useMemo(
+    () =>
+      Array.from({ length: daysInMonth(year, monthIndex) }, (_, i) => i + 1),
+    [year, monthIndex],
+  );
 
   useEffect(() => {
     // refresh students when class changes
-    const stored = JSON.parse(localStorage.getItem(`students:${scopeSchoolId}`) || localStorage.getItem("students") || "[]");
-    const list = (stored.filter((s: any) => !s.className || s.className === cls) as any[]).map((s: any, i: number) => ({ name: s.name || `Student ${i + 1}`, id: s.roll || String(i + 1).padStart(3, "0") }));
-    setStudents(list.length ? list : Array.from({ length: 12 }, (_, i) => ({ name: `Student ${i + 1}`, id: String(i + 1).padStart(3, "0") })));
+    const stored = JSON.parse(
+      localStorage.getItem(`students:${scopeSchoolId}`) ||
+        localStorage.getItem("students") ||
+        "[]",
+    );
+    const list = (
+      stored.filter((s: any) => !s.className || s.className === cls) as any[]
+    ).map((s: any, i: number) => ({
+      name: s.name || `Student ${i + 1}`,
+      id: s.roll || String(i + 1).padStart(3, "0"),
+    }));
+    setStudents(
+      list.length
+        ? list
+        : Array.from({ length: 12 }, (_, i) => ({
+            name: `Student ${i + 1}`,
+            id: String(i + 1).padStart(3, "0"),
+          })),
+    );
     // load window per class
-    const s = localStorage.getItem(`window:${cls}:start`) || localStorage.getItem(`window:school:${scopeSchoolId}:start`) || "08:30";
-    const e = localStorage.getItem(`window:${cls}:end`) || localStorage.getItem(`window:school:${scopeSchoolId}:end`) || "10:00";
+    const s =
+      localStorage.getItem(`window:${cls}:start`) ||
+      localStorage.getItem(`window:school:${scopeSchoolId}:start`) ||
+      "08:30";
+    const e =
+      localStorage.getItem(`window:${cls}:end`) ||
+      localStorage.getItem(`window:school:${scopeSchoolId}:end`) ||
+      "10:00";
     setStartTime(s as string);
     setEndTime(e as string);
   }, [cls]);
@@ -69,7 +112,9 @@ export default function AnnualAttendance() {
   const getStatus = (studentId: string, d: number): "P" | "A" | "" => {
     const date = fmtDate(year, monthIndex, d);
     const key = `attendance:${scopeDoId}:${scopeSchoolId}:${date}:${cls}`;
-    const rec: Record<string, boolean> = JSON.parse(localStorage.getItem(key) || "{}");
+    const rec: Record<string, boolean> = JSON.parse(
+      localStorage.getItem(key) || "{}",
+    );
     if (rec[studentId]) return "P";
     const todayStr = fmtDate(now.getFullYear(), now.getMonth(), now.getDate());
     const endMinutes = parseTimeToMinutes(endTime);
@@ -83,7 +128,9 @@ export default function AnnualAttendance() {
   const toggleCell = (studentId: string, d: number) => {
     const date = fmtDate(year, monthIndex, d);
     const key = `attendance:${scopeDoId}:${scopeSchoolId}:${date}:${cls}`;
-    const rec: Record<string, boolean> = JSON.parse(localStorage.getItem(key) || "{}");
+    const rec: Record<string, boolean> = JSON.parse(
+      localStorage.getItem(key) || "{}",
+    );
     const status = rec[studentId] === true ? "P" : getStatus(studentId, d);
     if (status === "P") {
       delete rec[studentId]; // toggle to Absent
@@ -93,7 +140,20 @@ export default function AnnualAttendance() {
     localStorage.setItem(key, JSON.stringify(rec));
   };
 
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   return (
     <AppLayout>
@@ -104,73 +164,135 @@ export default function AnnualAttendance() {
             {/* If DO role, allow picking school */}
             {localStorage.getItem("auth.role") === "do" && (
               <Select value={selectedSchool} onValueChange={setSelectedSchool}>
-                <SelectTrigger className="w-44"><SelectValue placeholder="School" /></SelectTrigger>
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder="School" />
+                </SelectTrigger>
                 <SelectContent>
-                  {schools.map((s)=> (<SelectItem key={s.schoolId} value={s.schoolId}>{s.name || s.schoolId}</SelectItem>))}
+                  {schools.map((s) => (
+                    <SelectItem key={s.schoolId} value={s.schoolId}>
+                      {s.name || s.schoolId}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             )}
             <Select value={cls} onValueChange={setCls}>
-              <SelectTrigger className="w-36"><SelectValue placeholder="Class" /></SelectTrigger>
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Class" />
+              </SelectTrigger>
               <SelectContent>
                 {Array.from({ length: 11 }, (_, i) => (
-                  <SelectItem key={i} value={`Class ${i + 1}`}>{`Class ${i + 1}`}</SelectItem>
+                  <SelectItem
+                    key={i}
+                    value={`Class ${i + 1}`}
+                  >{`Class ${i + 1}`}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Select value={String(monthIndex)} onValueChange={(v) => setMonthIndex(Number(v))}>
-              <SelectTrigger className="w-36"><SelectValue placeholder="Month" /></SelectTrigger>
+            <Select
+              value={String(monthIndex)}
+              onValueChange={(v) => setMonthIndex(Number(v))}
+            >
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Month" />
+              </SelectTrigger>
               <SelectContent>
                 {months.map((m, i) => (
-                  <SelectItem key={m} value={String(i)}>{m}</SelectItem>
+                  <SelectItem key={m} value={String(i)}>
+                    {m}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Input type="number" className="w-24" value={year} onChange={(e)=>setYear(Number(e.target.value)||year)} />
+            <Input
+              type="number"
+              className="w-24"
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value) || year)}
+            />
             <div className="flex items-center gap-2 border rounded-md px-2 py-1 bg-background">
               <span className="text-xs text-muted-foreground">Window</span>
-              <Input type="time" value={startTime} onChange={(e)=>setStartTime(e.target.value)} className="w-28" />
+              <Input
+                type="time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className="w-28"
+              />
               <span className="text-muted-foreground">–</span>
-              <Input type="time" value={endTime} onChange={(e)=>setEndTime(e.target.value)} className="w-28" />
-              <Button onClick={saveWindow} size="sm" className="ml-1">Save</Button>
+              <Input
+                type="time"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className="w-28"
+              />
+              <Button onClick={saveWindow} size="sm" className="ml-1">
+                Save
+              </Button>
             </div>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{months[monthIndex]} {year} • {cls} • {scopeSchoolId}</CardTitle>
+            <CardTitle className="text-base">
+              {months[monthIndex]} {year} • {cls} • {scopeSchoolId}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-auto border rounded-md">
               <table className="min-w-[900px] w-full border-collapse">
                 <thead>
                   <tr className="bg-muted/50 text-sm">
-                    <th className="sticky left-0 bg-muted/50 p-2 text-left font-medium border-r">Student</th>
+                    <th className="sticky left-0 bg-muted/50 p-2 text-left font-medium border-r">
+                      Student
+                    </th>
                     {days.map((d) => (
-                      <th key={d} className="px-2 py-1 border-l text-center font-medium">{d}</th>
+                      <th
+                        key={d}
+                        className="px-2 py-1 border-l text-center font-medium"
+                      >
+                        {d}
+                      </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {students.map((s) => (
-                    <tr key={s.id} className="odd:bg-background even:bg-muted/20">
+                    <tr
+                      key={s.id}
+                      className="odd:bg-background even:bg-muted/20"
+                    >
                       <td className="sticky left-0 bg-inherit p-2 border-r whitespace-nowrap">
-                        <div className="font-medium leading-tight">{s.name}</div>
-                        <div className="text-xs text-muted-foreground">ID: {s.id}</div>
+                        <div className="font-medium leading-tight">
+                          {s.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          ID: {s.id}
+                        </div>
                       </td>
                       {days.map((d) => {
                         const st = getStatus(s.id, d);
                         return (
                           <td
                             key={d}
-                            onClick={() => { toggleCell(s.id, d); /* re-render by updating state */ setStudents((x)=>[...x]); }}
+                            onClick={() => {
+                              toggleCell(s.id, d);
+                              /* re-render by updating state */ setStudents(
+                                (x) => [...x],
+                              );
+                            }}
                             className={cn(
                               "h-9 border-l text-center select-none cursor-pointer align-middle",
                               st === "P" && "bg-emerald-50 text-emerald-700",
                               st === "A" && "bg-red-50 text-red-700",
                             )}
-                            title={st === "" ? "Pending" : st === "P" ? "Present" : "Absent (click to edit)"}
+                            title={
+                              st === ""
+                                ? "Pending"
+                                : st === "P"
+                                  ? "Present"
+                                  : "Absent (click to edit)"
+                            }
                           >
                             {st === "" ? "" : st}
                           </td>
@@ -181,7 +303,11 @@ export default function AnnualAttendance() {
                 </tbody>
               </table>
             </div>
-            <div className="text-xs text-muted-foreground mt-2">Legend: P = Present, A = Absent. Click any cell to toggle. If not marked by the end of the window, students are marked Absent automatically.</div>
+            <div className="text-xs text-muted-foreground mt-2">
+              Legend: P = Present, A = Absent. Click any cell to toggle. If not
+              marked by the end of the window, students are marked Absent
+              automatically.
+            </div>
           </CardContent>
         </Card>
       </div>
