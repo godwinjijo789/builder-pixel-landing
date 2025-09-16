@@ -26,7 +26,7 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Bell, Gauge, Layers, Settings, UserPlus, CalendarDays, CheckSquare, Building2, Users } from "lucide-react";
+import { Bell, Gauge, Layers, Settings, UserPlus, CalendarDays, CheckSquare, Building2, Users, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth";
 
@@ -76,6 +76,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 <NavLink to="/enrollment" label="Student Enrollment" icon={UserPlus} hidden={role === 'do'} />
                 <NavLink to="/alerts" label="Parent Alerts" icon={Bell} hidden={role==='do'} />
                 <NavLink to="/status" label="System Status" icon={Layers} />
+                <NavLink to="/cctv" label="CCTV Cameras" icon={Video} hidden={role==='do'} />
                 <NavLink to="/annual" label="Annual Attendance" icon={CalendarDays} />
                 <NavLink to="/students" label="Students" icon={Users} hidden={role==='do'} />
                 <NavLink to="/manual" label="Manual Attendance" icon={CheckSquare} hidden={role === 'do'} />
