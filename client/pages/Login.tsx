@@ -20,6 +20,14 @@ export default function Login() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (role === "school" && !schoolId.trim()) {
+      toast.error("School ID is required for School login.");
+      return;
+    }
+    if (role === "do" && !doId.trim()) {
+      toast.error("DO Office ID is required for DO login.");
+      return;
+    }
     setLoading(true);
     const ok = await login({ username, password, role, doId: role === "do" ? doId : undefined, schoolId: role === "school" ? schoolId : undefined });
     setLoading(false);
@@ -27,7 +35,7 @@ export default function Login() {
       toast.success("Welcome back");
       navigate("/");
     } else {
-      toast.error("Invalid credentials. Use admin/password for demo.");
+      toast.error("Invalid credentials or missing ID.");
     }
   };
 
