@@ -30,7 +30,7 @@ function Protected({ children }: { children: React.ReactNode }) {
 
 function RoleHome() {
   const { role } = useAuth();
-  return role === 'do' ? <DOOffice /> : <Index />;
+  return role === "do" ? <DOOffice /> : <Index />;
 }
 
 const App = () => (
@@ -42,16 +42,87 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Protected>{/* Role-based landing */}<RoleHome /></Protected>} />
-            <Route path="/enrollment" element={<Protected><Enrollment /></Protected>} />
-            <Route path="/alerts" element={<Protected><Alerts /></Protected>} />
-            <Route path="/status" element={<Protected><SystemStatus /></Protected>} />
-            <Route path="/annual" element={<Protected><AnnualAttendance /></Protected>} />
-            <Route path="/manual" element={<Protected><ManualAttendance /></Protected>} />
-            <Route path="/students" element={<Protected><Students /></Protected>} />
-            <Route path="/cctv" element={<Protected><CCTV /></Protected>} />
-            <Route path="/do-office" element={<Protected><DOOffice /></Protected>} />
-            <Route path="/auto-windows" element={<Protected><AutoWindows /></Protected>} />
+            <Route
+              path="/"
+              element={
+                <Protected>
+                  {/* Role-based landing */}
+                  <RoleHome />
+                </Protected>
+              }
+            />
+            <Route
+              path="/enrollment"
+              element={
+                <Protected>
+                  <Enrollment />
+                </Protected>
+              }
+            />
+            <Route
+              path="/alerts"
+              element={
+                <Protected>
+                  <Alerts />
+                </Protected>
+              }
+            />
+            <Route
+              path="/status"
+              element={
+                <Protected>
+                  <SystemStatus />
+                </Protected>
+              }
+            />
+            <Route
+              path="/annual"
+              element={
+                <Protected>
+                  <AnnualAttendance />
+                </Protected>
+              }
+            />
+            <Route
+              path="/manual"
+              element={
+                <Protected>
+                  <ManualAttendance />
+                </Protected>
+              }
+            />
+            <Route
+              path="/students"
+              element={
+                <Protected>
+                  <Students />
+                </Protected>
+              }
+            />
+            <Route
+              path="/cctv"
+              element={
+                <Protected>
+                  <CCTV />
+                </Protected>
+              }
+            />
+            <Route
+              path="/do-office"
+              element={
+                <Protected>
+                  <DOOffice />
+                </Protected>
+              }
+            />
+            <Route
+              path="/auto-windows"
+              element={
+                <Protected>
+                  <AutoWindows />
+                </Protected>
+              }
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

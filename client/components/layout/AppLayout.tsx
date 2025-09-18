@@ -26,11 +26,32 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Bell, Gauge, Layers, Settings, UserPlus, CalendarDays, CheckSquare, Building2, Users, Video } from "lucide-react";
+import {
+  Bell,
+  Gauge,
+  Layers,
+  Settings,
+  UserPlus,
+  CalendarDays,
+  CheckSquare,
+  Building2,
+  Users,
+  Video,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth";
 
-function NavLink({ to, label, icon: Icon, hidden }: { to: string; label: string; icon: React.ComponentType<{ className?: string }>; hidden?: boolean; }) {
+function NavLink({
+  to,
+  label,
+  icon: Icon,
+  hidden,
+}: {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  hidden?: boolean;
+}) {
   const location = useLocation();
   const active = location.pathname === to;
   if (hidden) return null;
@@ -48,7 +69,9 @@ function NavLink({ to, label, icon: Icon, hidden }: { to: string; label: string;
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { logout, role, profile, saveProfile } = useAuth();
-  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
+  const [dark, setDark] = useState(() =>
+    document.documentElement.classList.contains("dark"),
+  );
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
     localStorage.setItem("theme.dark", dark ? "1" : "0");
@@ -73,15 +96,53 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <SidebarGroupContent>
               <SidebarMenu>
                 <NavLink to="/" label="Dashboard" icon={Gauge} />
-                <NavLink to="/enrollment" label="Student Enrollment" icon={UserPlus} hidden={role === 'do'} />
-                <NavLink to="/alerts" label="Parent Alerts" icon={Bell} hidden={role==='do'} />
+                <NavLink
+                  to="/enrollment"
+                  label="Student Enrollment"
+                  icon={UserPlus}
+                />
+                <NavLink
+                  to="/alerts"
+                  label="Parent Alerts"
+                  icon={Bell}
+                  hidden={role === "do"}
+                />
                 <NavLink to="/status" label="System Status" icon={Layers} />
-                <NavLink to="/cctv" label="CCTV Cameras" icon={Video} hidden={role==='do'} />
-                <NavLink to="/annual" label="Annual Attendance" icon={CalendarDays} />
-                <NavLink to="/students" label="Students" icon={Users} hidden={role==='do'} />
-                <NavLink to="/manual" label="Manual Attendance" icon={CheckSquare} hidden={role === 'do'} />
-                <NavLink to="/do-office" label="DO Office" icon={Building2} hidden={role !== 'do'} />
-                <NavLink to="/auto-windows" label="Auto Windows" icon={Layers} hidden={role !== 'do'} />
+                <NavLink
+                  to="/cctv"
+                  label="CCTV Cameras"
+                  icon={Video}
+                  hidden={role === "do"}
+                />
+                <NavLink
+                  to="/annual"
+                  label="Annual Attendance"
+                  icon={CalendarDays}
+                />
+                <NavLink
+                  to="/students"
+                  label="Students"
+                  icon={Users}
+                  hidden={role === "do"}
+                />
+                <NavLink
+                  to="/manual"
+                  label="Manual Attendance"
+                  icon={CheckSquare}
+                  hidden={role === "do"}
+                />
+                <NavLink
+                  to="/do-office"
+                  label="DO Office"
+                  icon={Building2}
+                  hidden={role !== "do"}
+                />
+                <NavLink
+                  to="/auto-windows"
+                  label="Auto Windows"
+                  icon={Layers}
+                  hidden={role !== "do"}
+                />
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -95,12 +156,20 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <SidebarInset>
         <header className="sticky top-0 z-20 border-b bg-primary text-primary-foreground">
           <div className="flex h-12 items-center px-3 w-full">
-            <SidebarTrigger className={cn("text-primary-foreground hover:bg-white/10")}/>
-            <div className="ml-2 font-semibold tracking-tight">Automated Attendance for Rural Schools</div>
+            <SidebarTrigger
+              className={cn("text-primary-foreground hover:bg-white/10")}
+            />
+            <div className="ml-2 font-semibold tracking-tight">
+              Automated Attendance for Rural Schools
+            </div>
             <div className="ml-auto flex items-center gap-2">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-white/10">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary-foreground hover:bg-white/10"
+                  >
                     <Settings className="h-4 w-4" />
                   </Button>
                 </DialogTrigger>
@@ -112,36 +181,134 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">Dark Mode</div>
-                        <div className="text-sm text-muted-foreground">Toggle site theme</div>
+                        <div className="text-sm text-muted-foreground">
+                          Toggle site theme
+                        </div>
                       </div>
                       <Switch checked={dark} onCheckedChange={setDark} />
                     </div>
 
-                    {role === 'school' && (
+                    {role === "school" && (
                       <div className="space-y-2">
                         <div className="font-medium">School Details</div>
                         <div className="grid sm:grid-cols-2 gap-2">
-                          <label className="text-sm">School Name<input className="input-like" value={profile?.name || ''} onChange={(e)=>saveProfile({ ...(profile||{name:'',schoolId:'',district:'',address:'',doId:''}), name:e.target.value })} /></label>
-                          <label className="text-sm">School ID<input className="input-like" value={profile?.schoolId || ''} onChange={(e)=>saveProfile({ ...(profile||{name:'',schoolId:'',district:'',address:'',doId:''}), schoolId:e.target.value })} /></label>
-                          <label className="text-sm">District<input className="input-like" value={profile?.district || ''} onChange={(e)=>saveProfile({ ...(profile||{name:'',schoolId:'',district:'',address:'',doId:''}), district:e.target.value })} /></label>
-                          <label className="text-sm">Address<input className="input-like" value={profile?.address || ''} onChange={(e)=>saveProfile({ ...(profile||{name:'',schoolId:'',district:'',address:'',doId:''}), address:e.target.value })} /></label>
-                          <label className="text-sm sm:col-span-2">DO Office ID<input className="input-like" value={profile?.doId || ''} onChange={(e)=>saveProfile({ ...(profile||{name:'',schoolId:'',district:'',address:'',doId:''}), doId:e.target.value })} /></label>
+                          <label className="text-sm">
+                            School Name
+                            <input
+                              className="input-like"
+                              value={profile?.name || ""}
+                              onChange={(e) =>
+                                saveProfile({
+                                  ...(profile || {
+                                    name: "",
+                                    schoolId: "",
+                                    district: "",
+                                    address: "",
+                                    doId: "",
+                                  }),
+                                  name: e.target.value,
+                                })
+                              }
+                            />
+                          </label>
+                          <label className="text-sm">
+                            School ID
+                            <input
+                              className="input-like"
+                              value={profile?.schoolId || ""}
+                              onChange={(e) =>
+                                saveProfile({
+                                  ...(profile || {
+                                    name: "",
+                                    schoolId: "",
+                                    district: "",
+                                    address: "",
+                                    doId: "",
+                                  }),
+                                  schoolId: e.target.value,
+                                })
+                              }
+                            />
+                          </label>
+                          <label className="text-sm">
+                            District
+                            <input
+                              className="input-like"
+                              value={profile?.district || ""}
+                              onChange={(e) =>
+                                saveProfile({
+                                  ...(profile || {
+                                    name: "",
+                                    schoolId: "",
+                                    district: "",
+                                    address: "",
+                                    doId: "",
+                                  }),
+                                  district: e.target.value,
+                                })
+                              }
+                            />
+                          </label>
+                          <label className="text-sm">
+                            Address
+                            <input
+                              className="input-like"
+                              value={profile?.address || ""}
+                              onChange={(e) =>
+                                saveProfile({
+                                  ...(profile || {
+                                    name: "",
+                                    schoolId: "",
+                                    district: "",
+                                    address: "",
+                                    doId: "",
+                                  }),
+                                  address: e.target.value,
+                                })
+                              }
+                            />
+                          </label>
+                          <label className="text-sm sm:col-span-2">
+                            DO Office ID
+                            <input
+                              className="input-like"
+                              value={profile?.doId || ""}
+                              onChange={(e) =>
+                                saveProfile({
+                                  ...(profile || {
+                                    name: "",
+                                    schoolId: "",
+                                    district: "",
+                                    address: "",
+                                    doId: "",
+                                  }),
+                                  doId: e.target.value,
+                                })
+                              }
+                            />
+                          </label>
                         </div>
                       </div>
                     )}
 
-                    <Button variant="destructive" onClick={logout}>Logout</Button>
+                    <Button variant="destructive" onClick={logout}>
+                      Logout
+                    </Button>
                   </div>
                 </DialogContent>
               </Dialog>
               <Avatar className="h-7 w-7 border border-white/30">
-                <AvatarFallback className="bg-white/20 text-white">AD</AvatarFallback>
+                <AvatarFallback className="bg-white/20 text-white">
+                  AD
+                </AvatarFallback>
               </Avatar>
             </div>
           </div>
         </header>
         <style>{`.input-like{ @apply w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring; }`}</style>
-        <main className="p-4 md:p-6 bg-muted/30 min-h-[calc(100svh-3rem)]">{children}</main>
+        <main className="p-4 md:p-6 bg-muted/30 min-h-[calc(100svh-3rem)]">
+          {children}
+        </main>
         <footer className="border-t text-xs text-muted-foreground bg-background">
           <div className="container mx-auto px-4 py-3 flex items-center gap-6">
             <span>Support</span>

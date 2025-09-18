@@ -1,4 +1,10 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 type Role = "school" | "do";
 export type SchoolProfile = {
@@ -13,7 +19,13 @@ type AuthContextType = {
   isAuthenticated: boolean;
   role: Role | null;
   profile: SchoolProfile | null; // only when role === 'school'
-  login: (opts: { username: string; password: string; role: Role; doId?: string; schoolId?: string }) => Promise<boolean>;
+  login: (opts: {
+    username: string;
+    password: string;
+    role: Role;
+    doId?: string;
+    schoolId?: string;
+  }) => Promise<boolean>;
   logout: () => void;
   saveProfile: (p: SchoolProfile) => void;
 };
@@ -34,8 +46,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (profRaw) setProfile(JSON.parse(profRaw));
   }, []);
 
-  const login = async ({ username, password, role, doId, schoolId }: { username: string; password: string; role: Role; doId?: string; schoolId?: string; }) => {
-    const credsOk = username.trim().toLowerCase() === "admin" && password === "password";
+  const login = async ({
+    username,
+    password,
+    role,
+    doId,
+    schoolId,
+  }: {
+    username: string;
+    password: string;
+    role: Role;
+    doId?: string;
+    schoolId?: string;
+  }) => {
+    const credsOk =
+      username.trim().toLowerCase() === "admin" && password === "password";
     if (!credsOk) return false;
 
     if (role === "do") {
@@ -53,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (role === "school" && schoolId) {
       const prof: SchoolProfile = {
-        name: (profile?.name || ""),
+        name: profile?.name || "",
         schoolId,
         district: profile?.district || "",
         address: profile?.address || "",
@@ -61,9 +86,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       localStorage.setItem("school.profile", JSON.stringify(prof));
       setProfile(prof);
-      const list: SchoolProfile[] = JSON.parse(localStorage.getItem("schools") || "[]");
+      const list: SchoolProfile[] = JSON.parse(
+        localStorage.getItem("schools") || "[]",
+      );
       const idx = list.findIndex((s) => s.schoolId === prof.schoolId);
-      if (idx >= 0) list[idx] = prof; else list.push(prof);
+      if (idx >= 0) list[idx] = prof;
+      else list.push(prof);
       localStorage.setItem("schools", JSON.stringify(list));
     }
 
@@ -81,14 +109,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(p);
     localStorage.setItem("school.profile", JSON.stringify(p));
     // also store in global schools list for DO portal
-    const list: SchoolProfile[] = JSON.parse(localStorage.getItem("schools") || "[]");
+    const list: SchoolProfile[] = JSON.parse(
+      localStorage.getItem("schools") || "[]",
+    );
     const idx = list.findIndex((s) => s.schoolId === p.schoolId);
-    if (idx >= 0) list[idx] = p; else list.push(p);
+    if (idx >= 0) list[idx] = p;
+    else list.push(p);
     localStorage.setItem("schools", JSON.stringify(list));
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, role, profile, login, logout, saveProfile }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, role, profile, login, logout, saveProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );

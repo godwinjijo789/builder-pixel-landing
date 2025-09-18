@@ -29,7 +29,13 @@ export default function Login() {
       return;
     }
     setLoading(true);
-    const ok = await login({ username, password, role, doId: role === "do" ? doId : undefined, schoolId: role === "school" ? schoolId : undefined });
+    const ok = await login({
+      username,
+      password,
+      role,
+      doId: role === "do" ? doId : undefined,
+      schoolId: role === "school" ? schoolId : undefined,
+    });
     setLoading(false);
     if (ok) {
       toast.success("Welcome back");
@@ -48,7 +54,11 @@ export default function Login() {
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="flex gap-4 items-center">
-              <RadioGroup value={role} onValueChange={(v)=>setRole(v as any)} className="flex gap-6">
+              <RadioGroup
+                value={role}
+                onValueChange={(v) => setRole(v as any)}
+                className="flex gap-6"
+              >
                 <div className="flex items-center gap-2">
                   <RadioGroupItem id="school" value="school" />
                   <Label htmlFor="school">School Login</Label>
@@ -61,22 +71,39 @@ export default function Login() {
             </div>
             <div>
               <label className="text-sm">Username</label>
-              <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="admin" />
+              <Input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="admin"
+              />
             </div>
             <div>
               <label className="text-sm">Password</label>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="password" />
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="password"
+              />
             </div>
             {role === "school" && (
               <div>
                 <label className="text-sm">School ID</label>
-                <Input value={schoolId} onChange={(e)=>setSchoolId(e.target.value)} placeholder="e.g., SCH-001" />
+                <Input
+                  value={schoolId}
+                  onChange={(e) => setSchoolId(e.target.value)}
+                  placeholder="e.g., SCH-001"
+                />
               </div>
             )}
             {role === "do" && (
               <div>
                 <label className="text-sm">DO Office ID</label>
-                <Input value={doId} onChange={(e)=>setDoId(e.target.value)} placeholder="e.g., DO-123" />
+                <Input
+                  value={doId}
+                  onChange={(e) => setDoId(e.target.value)}
+                  placeholder="e.g., DO-123"
+                />
               </div>
             )}
             <Button className="w-full" disabled={loading} type="submit">
